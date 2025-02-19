@@ -181,7 +181,7 @@ impl<'a> FieldMapping for Field<'a> {
         let mut param = self.ty().to_from_clause(sexpr_mod, param);
 
         if self.is_variable() {
-            param = quote! { mlang::rt::opcode::Variable::Constant(#param) };
+            param = quote! { mlang_rs::rt::opcode::Variable::Constant(#param) };
         }
 
         if self.is_option() {
@@ -204,7 +204,7 @@ impl<'a> FieldMapping for Field<'a> {
 
         if self.is_variable() {
             ty = quote! {
-                mlang::rt::opcode::Variable<#ty>
+                mlang_rs::rt::opcode::Variable<#ty>
             };
         }
 

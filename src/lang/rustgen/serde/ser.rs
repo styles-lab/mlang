@@ -57,12 +57,12 @@ impl SerializeCodeGen for Node {
         };
 
         quote! {
-            impl mlang::rt::serde::ser::Serialize for #opcode_mod #ident {
+            impl mlang_rs::rt::serde::ser::Serialize for #opcode_mod #ident {
                 fn serialize<S>(&self, serializer: S) -> Result<(), S::Error>
                 where
-                    S: mlang::rt::serde::ser::Serializer
+                    S: mlang_rs::rt::serde::ser::Serializer
                 {
-                    use mlang::rt::serde::ser::SerializeNode;
+                    use mlang_rs::rt::serde::ser::SerializeNode;
                     let #mut_token serializer = serializer.#serialize_fn(#idx, #name, #fields)?;
                     #(#stats;)*
 
@@ -131,12 +131,12 @@ impl SerializeCodeGen for Enum {
         let ident = self.to_ident();
 
         quote! {
-            impl mlang::rt::serde::ser::Serialize for #opcode_mod #ident {
+            impl mlang_rs::rt::serde::ser::Serialize for #opcode_mod #ident {
                 fn serialize<S>(&self, serializer: S) -> Result<(), S::Error>
                 where
-                    S: mlang::rt::serde::ser::Serializer
+                    S: mlang_rs::rt::serde::ser::Serializer
                 {
-                    use mlang::rt::serde::ser::SerializeNode;
+                    use mlang_rs::rt::serde::ser::SerializeNode;
                     match self {
                         #(#stats),*
                     }

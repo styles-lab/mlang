@@ -335,15 +335,15 @@ impl CodeGen {
         }
 
         quote! {
-            impl mlang::rt::serde::de::Deserialize for #opcode_mod Opcode {
+            impl mlang_rs::rt::serde::de::Deserialize for #opcode_mod Opcode {
                 type Value = Option<Vec<#opcode_mod Opcode>>;
 
                 fn deserialize<D>(deserializer: D) -> Result<Self::Value, D::Error>
                 where
-                    D: mlang::rt::serde::de::Deserializer
+                    D: mlang_rs::rt::serde::de::Deserializer
 
                 {
-                    use mlang::rt::serde::de::*;
+                    use mlang_rs::rt::serde::de::*;
 
                     let _ = deserializer;
 
@@ -379,7 +379,7 @@ impl CodeGen {
                             match type_id {
                                 #(#visit_opcode_clauses,)*
                                 _ => {
-                                    return Err(mlang::rt::serde::de::Error::UnknownType(type_id).into());
+                                    return Err(mlang_rs::rt::serde::de::Error::UnknownType(type_id).into());
                                 }
                             }
                         }
@@ -393,7 +393,7 @@ impl CodeGen {
                             match name {
                                 #(#visit_opcode_with_clauses,)*
                                 _ => {
-                                    return Err(mlang::rt::serde::de::Error::UnknownTypeName(name.to_string()).into());
+                                    return Err(mlang_rs::rt::serde::de::Error::UnknownTypeName(name.to_string()).into());
                                 }
                             }
                         }
@@ -475,10 +475,10 @@ impl CodeGen {
         }
 
         quote! {
-            impl mlang::rt::serde::ser::Serialize for #opcode_mod Opcode {
+            impl mlang_rs::rt::serde::ser::Serialize for #opcode_mod Opcode {
                 fn serialize<S>(&self, serializer: S) -> Result<(), S::Error>
                 where
-                    S: mlang::rt::serde::ser::Serializer
+                    S: mlang_rs::rt::serde::ser::Serializer
                 {
                     match self {
                         Self::Apply(v) => {

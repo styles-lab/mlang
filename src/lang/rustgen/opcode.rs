@@ -136,7 +136,7 @@ impl CodeGen {
     fn gen_variable_definition(&self) -> TokenStream {
         quote! {
             pub mod variable {
-                pub use mlang::rt::opcode::*;
+                pub use mlang_rs::rt::opcode::*;
             }
         }
     }

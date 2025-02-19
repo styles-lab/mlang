@@ -52,15 +52,15 @@ impl DeserializeCodeGen for Node {
         let name = self.display_name().unwrap();
 
         quote! {
-            impl mlang::rt::serde::de::Deserialize for #opcode_mod #ident {
+            impl mlang_rs::rt::serde::de::Deserialize for #opcode_mod #ident {
 
                 type Value = #opcode_mod #ident;
 
                 fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where
-                    D: mlang::rt::serde::de::Deserializer
+                    D: mlang_rs::rt::serde::de::Deserializer
                 {
-                    use mlang::rt::serde::de::*;
+                    use mlang_rs::rt::serde::de::*;
 
                     let _ = deserializer;
 
@@ -137,15 +137,15 @@ impl DeserializeCodeGen for Enum {
         let name = self.display_name().unwrap();
 
         quote! {
-            impl mlang::rt::serde::de::Deserialize for #opcode_mod #ty {
+            impl mlang_rs::rt::serde::de::Deserialize for #opcode_mod #ty {
 
                 type Value = #opcode_mod #ty;
 
                 fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where
-                    D: mlang::rt::serde::de::Deserializer
+                    D: mlang_rs::rt::serde::de::Deserializer
                 {
-                    use mlang::rt::serde::de::*;
+                    use mlang_rs::rt::serde::de::*;
 
                     let _ = deserializer;
 
