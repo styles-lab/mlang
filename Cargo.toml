@@ -1,0 +1,30 @@
+[package]
+description = "scheme definition language for markup languages"
+documentation = "https://docs.rs/mlang"
+edition = "2021"
+license = "MIT"
+name = "mlang"
+repository = "https://github.com/styles-lab/mlang"
+version = "0.1.0"
+
+[dependencies]
+log = {version = "^0.4", features = ["kv"]}
+parserc = {version = "^0.3"}
+thiserror = "^2"
+
+heck = {version = "^0.5", optional = true}
+proc-macro2 = {version = "^1", optional = true}
+quote = {version = "^1", optional = true}
+serde = {version = "^1", optional = true}
+
+[dev-dependencies]
+serde_json = {version = "^1"}
+
+[features]
+default = ["lang", "serde", "rt", "rt_serde"]
+
+lang = ["quote", "proc-macro2", "heck"]
+serde = ["dep:serde", "parserc/serde", "log/kv_serde"]
+
+rt = []
+rt_serde = []
