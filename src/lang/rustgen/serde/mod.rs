@@ -417,6 +417,10 @@ impl CodeGen {
 
                             let mut opcodes = vec![];
 
+                            let mut attrs = attrs.into_iter().collect::<Vec<_>>();
+
+                            attrs.sort();
+
                             for attr in attrs {
                                 opcodes.push(deserializer.deserialize_attr(attr,Self)?);
                             }
