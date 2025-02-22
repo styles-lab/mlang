@@ -28,7 +28,7 @@ mod ext {
             return Err(parserc::ControlFlow::Fatal);
         }
 
-        match codegen.gen(stats) {
+        match codegen.codegen(stats) {
             Err(err) => {
                 eprintln!("codegen: {}", err);
                 return Err(parserc::ControlFlow::Fatal);

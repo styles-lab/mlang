@@ -76,7 +76,7 @@ mod ext {
         }
 
         /// invoke real rust code generation processing.
-        pub fn gen(self, stats: impl AsRef<[Stat]>) -> Result<()> {
+        pub fn codegen(self, stats: impl AsRef<[Stat]>) -> Result<()> {
             if !self.target.exists() {
                 std::fs::create_dir_all(&self.target)?;
             }

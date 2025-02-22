@@ -57,7 +57,7 @@ impl CodeGen {
     }
 
     /// Generate sexpr mod
-    pub fn gen(self, stats: &[Stat]) -> TokenStream {
+    pub fn codegen(self, stats: &[Stat]) -> TokenStream {
         let opcode_mod = &self.0;
 
         let mut impls: Vec<TokenStream> = vec![];
@@ -513,5 +513,5 @@ impl CodeGen {
 
 /// Generate serde module from [`stats`](Stat).
 pub fn gen_serde_mod(stats: impl AsRef<[Stat]>, opcode_mod: impl AsRef<str>) -> TokenStream {
-    CodeGen::new(opcode_mod).gen(stats.as_ref())
+    CodeGen::new(opcode_mod).codegen(stats.as_ref())
 }

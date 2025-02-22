@@ -1,11 +1,11 @@
 [package]
 description = "scheme definition language for markup languages"
 documentation = "https://docs.rs/mlang-rs"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 name = "mlang-rs"
 repository = "https://github.com/styles-lab/mlang"
-version = "0.2.2"
+version = "0.2.3"
 
 [dependencies]
 log = {version = "^0.4", features = ["kv"]}

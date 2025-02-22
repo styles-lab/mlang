@@ -8,11 +8,11 @@ use crate::lang::{
 };
 
 trait TypeDefinitionCodeGen {
-    fn gen(&self) -> TokenStream;
+    fn codegen(&self) -> TokenStream;
 }
 
 impl TypeDefinitionCodeGen for Node {
-    fn gen(&self) -> TokenStream {
+    fn codegen(&self) -> TokenStream {
         let comments = self.to_comment();
         let ident = self.to_ident();
 
@@ -40,7 +40,7 @@ impl TypeDefinitionCodeGen for Node {
 }
 
 impl TypeDefinitionCodeGen for Enum {
-    fn gen(&self) -> TokenStream {
+    fn codegen(&self) -> TokenStream {
         let comments = self.to_comment();
         let ident = self.to_ident();
 
@@ -93,29 +93,29 @@ struct CodeGen {
 }
 
 impl CodeGen {
-    fn gen(mut self, stats: &[Stat]) -> TokenStream {
+    fn codegen(mut self, stats: &[Stat]) -> TokenStream {
         let mut token_streams = vec![];
 
         for opcode in stats {
             match opcode {
                 Stat::Element(node) => {
-                    token_streams.push(node.gen());
+                    token_streams.push(node.codegen());
                     self.el_types.push(node.to_ident());
                 }
                 Stat::Leaf(node) => {
-                    token_streams.push(node.gen());
+                    token_streams.push(node.codegen());
                     self.leaf_types.push(node.to_ident());
                 }
                 Stat::Attr(node) => {
-                    token_streams.push(node.gen());
+                    token_streams.push(node.codegen());
                     self.attr_types.push(node.to_ident());
                 }
                 Stat::Data(node) => {
-                    token_streams.push(node.gen());
+                    token_streams.push(node.codegen());
                     self.data_types.push(node.to_ident());
                 }
                 Stat::Enum(node) => {
-                    token_streams.push(node.gen());
+                    token_streams.push(node.codegen());
                     self.data_types.push(node.to_ident());
                 }
                 _ => {}
@@ -387,5 +387,5 @@ impl CodeGen {
 
 /// Generate opcode module from [`stats`](Stat).
 pub fn gen_opcode_mod(stats: impl AsRef<[Stat]>) -> TokenStream {
-    CodeGen::default().gen(stats.as_ref())
+    CodeGen::default().codegen(stats.as_ref())
 }
