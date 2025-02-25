@@ -1,25 +1,23 @@
 use parserc::{
-    ensure_char, ensure_keyword, take_till, take_while, ControlFlow, FromSrc, Parser, ParserExt,
-    Result,
+    ControlFlow, FromSrc, Parser, ParserExt, Result, ensure_char, ensure_keyword, take_till,
+    take_while,
 };
 
 use crate::lang::{
     ir::{LitStr, LitUint},
-    parser::{ParseError, UnitKind, MLANG_PARSER},
+    parser::{ParseError, UnitKind},
 };
 
 impl FromSrc for LitUint {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
         if let Some(start) = ensure_keyword("0x").ok().parse(ctx)? {
             let body = take_while(|c| c.is_ascii_hexdigit())
                 .parse(ctx)?
-                .ok_or_else(|| {
-                    log::error!(target: MLANG_PARSER, span:serde = start; "{}", ParseError::Uint(UnitKind::MissBody));
-                    ControlFlow::Fatal
-                })?;
+                .ok_or(ControlFlow::Fatal(None))?;
 
             assert!(body.len() > 0);
 
@@ -32,14 +30,11 @@ impl FromSrc for LitUint {
             return Ok(Self(numeric, start.extend_to_inclusive(body)));
         }
 
-        let start = ctx.span();
-
         let span = take_while(|c| c.is_ascii_digit())
             .parse(ctx)?
-            .ok_or_else(|| {
-                log::error!(target: MLANG_PARSER, span:serde = start; "{}", ParseError::Uint(UnitKind::MissBody));
-                ControlFlow::Fatal
-            })?;
+            .ok_or(ControlFlow::Fatal(Some(ParseError::Uint(
+                UnitKind::MissBody,
+            ))))?;
 
         let numeric = ctx.as_str(span);
 
@@ -52,7 +47,8 @@ impl FromSrc for LitUint {
 }
 
 impl FromSrc for LitStr {
-    fn parse(input: &mut parserc::ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(input: &mut parserc::ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {

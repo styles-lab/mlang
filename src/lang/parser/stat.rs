@@ -5,8 +5,11 @@ use crate::lang::{
     parser::{node::parse_node, utils::skip_ws},
 };
 
+use super::ParseError;
+
 impl FromSrc for Stat {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -38,6 +41,6 @@ impl FromSrc for Stat {
 
         assert_eq!(ctx.remaining(), 0, "Unparsed codes: {} ...", ctx.unparsed());
 
-        return Err(ControlFlow::Recoverable);
+        return Err(ControlFlow::Recoverable(None));
     }
 }

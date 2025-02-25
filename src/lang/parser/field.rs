@@ -1,4 +1,4 @@
-use parserc::{ensure_char, FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result};
+use parserc::{FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result, ensure_char};
 
 use crate::lang::{
     ir::{Fields, Ident, NamedField, Type, UnnamedField},
@@ -6,12 +6,13 @@ use crate::lang::{
 };
 
 use super::{
-    utils::{parse_prefix, skip_ws},
     NamedFieldKind,
+    utils::{parse_prefix, skip_ws},
 };
 
 impl FromSrc for NamedField {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -26,19 +27,13 @@ impl FromSrc for NamedField {
         skip_ws.parse(ctx)?;
 
         ensure_char(':')
-            .fatal(
-                ParseError::NamedField(NamedFieldKind::SemiColons),
-                ctx.span(),
-            )
+            .fatal(ParseError::NamedField(NamedFieldKind::SemiColons))
             .parse(ctx)?;
 
         skip_ws.parse(ctx)?;
 
         let ty = Type::into_parser()
-            .fatal(
-                ParseError::NamedField(NamedFieldKind::SemiColons),
-                ctx.span(),
-            )
+            .fatal(ParseError::NamedField(NamedFieldKind::SemiColons))
             .parse(ctx)?;
 
         Ok(NamedField {
@@ -52,7 +47,8 @@ impl FromSrc for NamedField {
 }
 
 impl FromSrc for UnnamedField {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -74,7 +70,8 @@ impl FromSrc for UnnamedField {
 }
 
 impl FromSrc for Fields {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -95,7 +92,7 @@ impl FromSrc for Fields {
             while let Some(field) = UnnamedField::into_parser().catch_fatal().parse(ctx)? {
                 fields.push(field);
 
-                skip_ws.parse(ctx)?;
+                skip_ws(ctx)?;
 
                 if ensure_char(',').ok().parse(ctx)?.is_none() {
                     break;
@@ -105,7 +102,7 @@ impl FromSrc for Fields {
             }
 
             ensure_char(')')
-                .fatal(ParseError::Fields(FieldsKind::EndTag(')')), ctx.span())
+                .fatal(ParseError::Fields(FieldsKind::EndTag(')')))
                 .parse(ctx)?;
 
             Ok(Fields::Unnamed(fields))
@@ -125,7 +122,7 @@ impl FromSrc for Fields {
             }
 
             ensure_char('}')
-                .fatal(ParseError::Fields(FieldsKind::EndTag('}')), ctx.span())
+                .fatal(ParseError::Fields(FieldsKind::EndTag('}')))
                 .parse(ctx)?;
 
             Ok(Fields::Named(fields))

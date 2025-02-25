@@ -1,5 +1,5 @@
 /// Error returns by `parser` mod
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum ParseError {
     #[error("Expect stat.")]
     Unparsed,
@@ -43,7 +43,7 @@ pub enum ParseError {
 }
 
 /// Error kind of parsing tuple `(ident,...)` stat.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum TupleKind {
     #[error("expect `(`.")]
     BodyStart,
@@ -52,7 +52,7 @@ pub enum TupleKind {
 }
 
 /// Error kind of parsing children .. of ... stat.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum ChildrenOfKind {
     #[error("expect keyword `of`.")]
     Of,
@@ -67,7 +67,7 @@ pub enum ChildrenOfKind {
 }
 
 /// Error kind of parsing apply .. to ... stat.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum ApplyToKind {
     #[error("expect keyword `to`.")]
     To,
@@ -78,7 +78,7 @@ pub enum ApplyToKind {
 }
 
 /// Error kind of node parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum GroupKind {
     #[error("expect `:=`.")]
     Assign,
@@ -88,7 +88,7 @@ pub enum GroupKind {
 }
 
 /// Error kind of node parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum NodeKind {
     #[error("epxect mixin `ident`.")]
     MixinIdent,
@@ -101,7 +101,7 @@ pub enum NodeKind {
 }
 
 /// Error kind of enum parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum NamedFieldKind {
     #[error("expect value/type split char `:`")]
     SemiColons,
@@ -111,14 +111,14 @@ pub enum NamedFieldKind {
 }
 
 /// Error kind of enum parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum FieldsKind {
     #[error("expect end tag `{0}`")]
     EndTag(char),
 }
 
 /// Error kind of enum parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum EnumKind {
     #[error("invalid enum ident.")]
     Ident,
@@ -131,7 +131,7 @@ pub enum EnumKind {
 }
 
 /// Error kind of unit parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum TypeKind {
     #[error("unrecognized array length.")]
     Uint,
@@ -150,21 +150,21 @@ pub enum TypeKind {
 }
 
 /// Error kind of unit parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum CallKind {
     #[error("expect call expr parameter list end tag `)`")]
     ParamEnd,
 }
 
 /// Error kind of unit parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum PropKind {
     #[error("expect property end tag `]`")]
     MissEnd,
 }
 
 /// Error kind of unit parsing.
-#[derive(Debug, thiserror::Error, PartialEq, PartialOrd)]
+#[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum UnitKind {
     #[error("miss hexadecimal body.")]
     MissBody,

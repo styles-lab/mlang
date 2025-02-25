@@ -1,12 +1,13 @@
-use parserc::{ensure_char, ensure_keyword, FromSrc, IntoParser, Parser, ParserExt};
+use parserc::{FromSrc, IntoParser, Parser, ParserExt, ensure_char, ensure_keyword};
 
 use crate::lang::{
     ir::{CallExpr, Ident, LitStr, Property},
-    parser::{utils::skip_ws, CallKind, ParseError, PropKind},
+    parser::{CallKind, ParseError, PropKind, utils::skip_ws},
 };
 
 impl FromSrc for CallExpr {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -33,7 +34,7 @@ impl FromSrc for CallExpr {
             }
 
             ensure_char(')')
-                .fatal(ParseError::Call(CallKind::ParamEnd), ctx.span())
+                .fatal(ParseError::Call(CallKind::ParamEnd))
                 .parse(ctx)?
         } else {
             target.0
@@ -48,7 +49,8 @@ impl FromSrc for CallExpr {
 }
 
 impl FromSrc for Property {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -71,7 +73,7 @@ impl FromSrc for Property {
         }
 
         let end = ensure_char(']')
-            .fatal(ParseError::Prop(PropKind::MissEnd), ctx.span())
+            .fatal(ParseError::Prop(PropKind::MissEnd))
             .parse(ctx)?;
 
         Ok(Self {

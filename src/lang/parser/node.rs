@@ -1,16 +1,16 @@
 use parserc::{
-    ensure_char, ensure_keyword, FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result,
+    FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result, ensure_char, ensure_keyword,
 };
 
 use crate::lang::{
     ir::{Enum, Fields, Ident, Node, Stat},
     parser::{
-        utils::{parse_prefix, skip_ws},
         EnumKind, NodeKind, ParseError,
+        utils::{parse_prefix, skip_ws},
     },
 };
 
-fn parse_node_body(ctx: &mut ParseContext<'_>) -> Result<Node> {
+fn parse_node_body(ctx: &mut ParseContext<'_>) -> Result<Node, ParseError> {
     let start = ctx.span();
 
     let ident = Ident::parse(ctx)?;
@@ -20,7 +20,7 @@ fn parse_node_body(ctx: &mut ParseContext<'_>) -> Result<Node> {
     let mixin = if let Some(_) = ensure_keyword("mixin").ok().parse(ctx)? {
         skip_ws(ctx)?;
         let mixin = Ident::into_parser()
-            .fatal(ParseError::Node(NodeKind::MixinIdent), ctx.span())
+            .fatal(ParseError::Node(NodeKind::MixinIdent))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
@@ -31,7 +31,7 @@ fn parse_node_body(ctx: &mut ParseContext<'_>) -> Result<Node> {
     };
 
     let fields = Fields::into_parser()
-        .fatal(ParseError::Node(NodeKind::Fields), ctx.span())
+        .fatal(ParseError::Node(NodeKind::Fields))
         .parse(ctx)?;
 
     let end = ctx.span();
@@ -46,7 +46,7 @@ fn parse_node_body(ctx: &mut ParseContext<'_>) -> Result<Node> {
     })
 }
 
-pub(super) fn parse_node(ctx: &mut ParseContext<'_>) -> Result<Stat> {
+pub(super) fn parse_node(ctx: &mut ParseContext<'_>) -> Result<Stat, ParseError> {
     let (comments, properties) = parse_prefix(ctx)?;
 
     let keyword = ensure_keyword("el")
@@ -65,7 +65,7 @@ pub(super) fn parse_node(ctx: &mut ParseContext<'_>) -> Result<Stat> {
 
     if node.fields.is_tuple() {
         ensure_char(';')
-            .fatal(ParseError::Node(NodeKind::End), ctx.span())
+            .fatal(ParseError::Node(NodeKind::End))
             .parse(ctx)?;
     }
 
@@ -80,7 +80,8 @@ pub(super) fn parse_node(ctx: &mut ParseContext<'_>) -> Result<Stat> {
 }
 
 impl FromSrc for Enum {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -93,13 +94,13 @@ impl FromSrc for Enum {
         skip_ws(ctx)?;
 
         let ident = Ident::into_parser()
-            .fatal(ParseError::Enum(EnumKind::Ident), ctx.span())
+            .fatal(ParseError::Enum(EnumKind::Ident))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
 
         ensure_char('{')
-            .fatal(ParseError::Enum(EnumKind::BodyStart), ctx.span())
+            .fatal(ParseError::Enum(EnumKind::BodyStart))
             .parse(ctx)?;
 
         let mut fields = vec![];
@@ -128,7 +129,7 @@ impl FromSrc for Enum {
         }
 
         let end = ensure_char('}')
-            .fatal(ParseError::Enum(EnumKind::BodyEnd), ctx.span())
+            .fatal(ParseError::Enum(EnumKind::BodyEnd))
             .parse(ctx)?;
 
         Ok(Enum {

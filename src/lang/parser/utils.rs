@@ -1,6 +1,6 @@
 use parserc::{
-    ensure_char, ensure_keyword, take_till, take_while, ControlFlow, FromSrc, IntoParser,
-    ParseContext, Parser, ParserExt, Result, Span,
+    ControlFlow, FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result, Span, ensure_char,
+    ensure_keyword, take_till, take_while,
 };
 
 use crate::lang::ir::{Comment, Ident, LitUint, Property, Type};
@@ -8,7 +8,8 @@ use crate::lang::ir::{Comment, Ident, LitUint, Property, Type};
 use super::ParseError;
 
 impl FromSrc for Ident {
-    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut parserc::ParseContext<'_>) -> parserc::Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -16,10 +17,10 @@ impl FromSrc for Ident {
 
         if let Some(c) = c {
             if c != '_' && !c.is_alphabetic() {
-                return Err(ControlFlow::Recoverable);
+                return Err(ControlFlow::Recoverable(None));
             }
         } else {
-            return Err(ControlFlow::Incomplete);
+            return Err(ControlFlow::Incomplete(None));
         }
 
         let body = take_while(|c| c == '_' || c.is_alphanumeric()).parse(ctx)?;
@@ -40,14 +41,15 @@ impl FromSrc for Ident {
     }
 }
 
-pub(super) fn skip_ws(ctx: &mut ParseContext<'_>) -> Result<Option<Span>> {
+pub(super) fn skip_ws(ctx: &mut ParseContext<'_>) -> Result<Option<Span>, ParseError> {
     let span = take_while(|c| c.is_whitespace()).parse(ctx)?;
 
     Ok(span)
 }
 
 impl FromSrc for Comment {
-    fn parse(input: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(input: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -69,7 +71,8 @@ impl FromSrc for Comment {
 }
 
 impl FromSrc for Type {
-    fn parse(input: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(input: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -97,7 +100,7 @@ impl FromSrc for Type {
             skip_ws(input)?;
 
             ensure_char('[')
-                .fatal(ParseError::Type(super::TypeKind::SquareBracketStart), start)
+                .fatal(ParseError::Type(super::TypeKind::SquareBracketStart))
                 .parse(input)?;
 
             skip_ws(input)?;
@@ -107,7 +110,7 @@ impl FromSrc for Type {
             skip_ws(input)?;
 
             let end = ensure_char(']')
-                .fatal(ParseError::Type(super::TypeKind::SquareBracketEnd), start)
+                .fatal(ParseError::Type(super::TypeKind::SquareBracketEnd))
                 .parse(input)?;
 
             return Ok(Type::ListOf(
@@ -124,19 +127,19 @@ impl FromSrc for Type {
             skip_ws(input)?;
 
             ensure_char(';')
-                .fatal(ParseError::Type(super::TypeKind::Semicolons), start)
+                .fatal(ParseError::Type(super::TypeKind::Semicolons))
                 .parse(input)?;
 
             skip_ws(input)?;
 
             let len = LitUint::into_parser()
-                .fatal(ParseError::Type(super::TypeKind::Uint), start)
+                .fatal(ParseError::Type(super::TypeKind::Uint))
                 .parse(input)?;
 
             skip_ws(input)?;
 
             let end = ensure_char(']')
-                .fatal(ParseError::Type(super::TypeKind::SquareBracketEnd), start)
+                .fatal(ParseError::Type(super::TypeKind::SquareBracketEnd))
                 .parse(input)?;
 
             return Ok(Type::ArrayOf(
@@ -158,7 +161,9 @@ pub(super) enum Prefix {
     Comment(Comment),
 }
 
-pub(super) fn parse_prefix(input: &mut ParseContext<'_>) -> Result<(Vec<Comment>, Vec<Property>)> {
+pub(super) fn parse_prefix(
+    input: &mut ParseContext<'_>,
+) -> Result<(Vec<Comment>, Vec<Property>), ParseError> {
     let mut properties = vec![];
     let mut comments = vec![];
 

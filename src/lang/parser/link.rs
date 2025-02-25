@@ -1,17 +1,17 @@
 use parserc::{
-    ensure_char, ensure_keyword, FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result,
+    FromSrc, IntoParser, ParseContext, Parser, ParserExt, Result, ensure_char, ensure_keyword,
 };
 
 use crate::lang::ir::{ApplyTo, ChildrenOf, Group, Ident};
 
 use super::{
-    utils::{parse_prefix, skip_ws},
     ApplyToKind, ChildrenOfKind, GroupKind, ParseError, TupleKind,
+    utils::{parse_prefix, skip_ws},
 };
 
-fn parse_tuple_idents(ctx: &mut ParseContext<'_>) -> Result<Vec<Ident>> {
+fn parse_tuple_idents(ctx: &mut ParseContext<'_>) -> Result<Vec<Ident>, ParseError> {
     ensure_char('(')
-        .fatal(ParseError::Tuple(TupleKind::BodyStart), ctx.span())
+        .fatal(ParseError::Tuple(TupleKind::BodyStart))
         .parse(ctx)?;
 
     skip_ws(ctx)?;
@@ -31,14 +31,15 @@ fn parse_tuple_idents(ctx: &mut ParseContext<'_>) -> Result<Vec<Ident>> {
     }
 
     ensure_char(')')
-        .fatal(ParseError::Tuple(TupleKind::BodyEnd), ctx.span())
+        .fatal(ParseError::Tuple(TupleKind::BodyEnd))
         .parse(ctx)?;
 
     Ok(children)
 }
 
 impl FromSrc for Group {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -55,7 +56,7 @@ impl FromSrc for Group {
         skip_ws.parse(ctx)?;
 
         ensure_keyword(":=")
-            .fatal(ParseError::Group(GroupKind::Assign), ctx.span())
+            .fatal(ParseError::Group(GroupKind::Assign))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
@@ -65,7 +66,7 @@ impl FromSrc for Group {
         skip_ws(ctx)?;
 
         let end = ensure_char(';')
-            .fatal(ParseError::Group(GroupKind::End), ctx.span())
+            .fatal(ParseError::Group(GroupKind::End))
             .parse(ctx)?;
 
         Ok(Self {
@@ -79,7 +80,8 @@ impl FromSrc for Group {
 }
 
 impl FromSrc for ApplyTo {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -99,7 +101,7 @@ impl FromSrc for ApplyTo {
         skip_ws(ctx)?;
 
         ensure_keyword("to")
-            .fatal(ParseError::ApplyTo(ApplyToKind::To), ctx.span())
+            .fatal(ParseError::ApplyTo(ApplyToKind::To))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
@@ -107,13 +109,13 @@ impl FromSrc for ApplyTo {
         let to = Ident::into_parser()
             .map(|v| vec![v])
             .or(parse_tuple_idents)
-            .fatal(ParseError::ApplyTo(ApplyToKind::Target), ctx.span())
+            .fatal(ParseError::ApplyTo(ApplyToKind::Target))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
 
         let end = ensure_char(';')
-            .fatal(ParseError::ApplyTo(ApplyToKind::End), ctx.span())
+            .fatal(ParseError::ApplyTo(ApplyToKind::End))
             .parse(ctx)?;
 
         Ok(Self {
@@ -127,7 +129,8 @@ impl FromSrc for ApplyTo {
 }
 
 impl FromSrc for ChildrenOf {
-    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self>
+    type Error = ParseError;
+    fn parse(ctx: &mut ParseContext<'_>) -> Result<Self, Self::Error>
     where
         Self: Sized,
     {
@@ -142,13 +145,13 @@ impl FromSrc for ChildrenOf {
         let from = Ident::into_parser()
             .map(|v| vec![v])
             .or(parse_tuple_idents)
-            .fatal(ParseError::ChildrenOf(ChildrenOfKind::From), ctx.span())
+            .fatal(ParseError::ChildrenOf(ChildrenOfKind::From))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
 
         ensure_keyword("of")
-            .fatal(ParseError::ChildrenOf(ChildrenOfKind::From), ctx.span())
+            .fatal(ParseError::ChildrenOf(ChildrenOfKind::From))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
@@ -156,13 +159,13 @@ impl FromSrc for ChildrenOf {
         let to = Ident::into_parser()
             .map(|v| vec![v])
             .or(parse_tuple_idents)
-            .fatal(ParseError::ChildrenOf(ChildrenOfKind::To), ctx.span())
+            .fatal(ParseError::ChildrenOf(ChildrenOfKind::To))
             .parse(ctx)?;
 
         skip_ws(ctx)?;
 
         let end = ensure_char(';')
-            .fatal(ParseError::ChildrenOf(ChildrenOfKind::End), ctx.span())
+            .fatal(ParseError::ChildrenOf(ChildrenOfKind::End))
             .parse(ctx)?;
 
         Ok(Self {
