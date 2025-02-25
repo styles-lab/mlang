@@ -9,7 +9,7 @@ version = "0.2.3"
 
 [dependencies]
 log = {version = "^0.4", features = ["kv"]}
-parserc = {version = "^0.3"}
+parserc = {version = "^0.4"}
 thiserror = "^2"
 
 heck = {version = "^0.5", optional = true}
