@@ -29,13 +29,13 @@ mod ext {
         };
 
         if !semantic_analyze(&mut stats) {
-            return Err(parserc::ControlFlow::Fatal(None));
+            return Err(parserc::ControlFlow::Fatal(ParseError::Semantic));
         }
 
         match codegen.codegen(stats) {
             Err(err) => {
                 eprintln!("codegen: {}", err);
-                return Err(parserc::ControlFlow::Fatal(None));
+                return Err(parserc::ControlFlow::Fatal(ParseError::Io(err.to_string())));
             }
             _ => {}
         }

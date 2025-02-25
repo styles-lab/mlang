@@ -17,10 +17,10 @@ impl FromSrc for Ident {
 
         if let Some(c) = c {
             if c != '_' && !c.is_alphabetic() {
-                return Err(ControlFlow::Recoverable(None));
+                return Err(ControlFlow::Recoverable(ParseError::Ident));
             }
         } else {
-            return Err(ControlFlow::Incomplete(None));
+            return Err(ControlFlow::Incomplete(ParseError::Ident));
         }
 
         let body = take_while(|c| c == '_' || c.is_alphanumeric()).parse(ctx)?;

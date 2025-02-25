@@ -41,6 +41,6 @@ impl FromSrc for Stat {
 
         assert_eq!(ctx.remaining(), 0, "Unparsed codes: {} ...", ctx.unparsed());
 
-        return Err(ControlFlow::Recoverable(None));
+        return Err(ControlFlow::Incomplete(ParseError::End));
     }
 }

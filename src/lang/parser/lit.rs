@@ -17,7 +17,7 @@ impl FromSrc for LitUint {
         if let Some(start) = ensure_keyword("0x").ok().parse(ctx)? {
             let body = take_while(|c| c.is_ascii_hexdigit())
                 .parse(ctx)?
-                .ok_or(ControlFlow::Fatal(None))?;
+                .ok_or(ControlFlow::Fatal(ParseError::Uint(UnitKind::Prefix)))?;
 
             assert!(body.len() > 0);
 
@@ -32,9 +32,7 @@ impl FromSrc for LitUint {
 
         let span = take_while(|c| c.is_ascii_digit())
             .parse(ctx)?
-            .ok_or(ControlFlow::Fatal(Some(ParseError::Uint(
-                UnitKind::MissBody,
-            ))))?;
+            .ok_or(ControlFlow::Fatal(ParseError::Uint(UnitKind::MissBody)))?;
 
         let numeric = ctx.as_str(span);
 

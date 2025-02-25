@@ -1,6 +1,21 @@
 /// Error returns by `parser` mod
 #[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum ParseError {
+    #[error("")]
+    End,
+
+    #[error("Invalid ident.")]
+    Ident,
+
+    #[error("semantic analyze error.")]
+    Semantic,
+
+    #[error(transparent)]
+    Parserc(#[from] parserc::Kind),
+
+    #[error("io error: {0}")]
+    Io(String),
+
     #[error("Expect stat.")]
     Unparsed,
     #[error("Syntax error of literal number, {0}")]
@@ -41,6 +56,8 @@ pub enum ParseError {
     #[error("Syntax error of children ... of ..., {0}")]
     ChildrenOf(ChildrenOfKind),
 }
+
+impl parserc::ParseError for ParseError {}
 
 /// Error kind of parsing tuple `(ident,...)` stat.
 #[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
@@ -166,6 +183,8 @@ pub enum PropKind {
 /// Error kind of unit parsing.
 #[derive(Debug, thiserror::Error, PartialEq, PartialOrd, Clone)]
 pub enum UnitKind {
+    #[error("miss hexadecimal prefix: 0x..")]
+    Prefix,
     #[error("miss hexadecimal body.")]
     MissBody,
 }
